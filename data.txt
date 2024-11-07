@@ -1,0 +1,1 @@
+Bottom: 358, Top: 11, Temp: -127.00, Turbidity: 264, H₂S: 623, Motor: ON, RO: OFF

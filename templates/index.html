@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Water Tank Sensor Data</title>
+		<style>
+			body {
+				font-family: 'Comic Sans MS', cursive, sans-serif;
+				margin: 0;
+				padding: 0;
+				background-color: #e0f7fa;
+				color: #333;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				overflow: hidden;
+			}
+			.container {
+				width: 90%; /* Adjusted width for responsiveness */
+				max-width: 1200px; /* Increased max-width */
+				padding: 20px;
+				background: #ffffff;
+				border-radius: 20px;
+				box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+				text-align: center;
+				box-sizing: border-box; /* Ensure padding does not exceed max-width */
+			}
+			h1 {
+				color: #00796b;
+				font-size: 2.5em; /* Adjusted font size */
+				margin-bottom: 20px;
+				font-weight: 700;
+			}
+			#animation {
+				margin: 15px 0;
+				padding: 15px;
+				background: #ffcc80;
+				border-radius: 15px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+				font-size: 1.5em; /* Adjusted font size */
+				font-weight: bold;
+				color: #ff5722;
+				animation: bounce 1.5s infinite;
+			}
+			.data-item {
+				display: inline-block; /* Use inline-block to align items horizontally */
+				width: 45%; /* Adjusted width */
+				margin: 10px; /* Reduced margin */
+				padding: 15px;
+				border: 2px solid #00796b;
+				border-radius: 10px;
+				background: #b2dfdb;
+				transition: background 0.3s, transform 0.3s;
+				font-size: 1.1em; /* Adjusted font size */
+			}
+			.data-item:hover {
+				background: #80cbc4;
+				transform: scale(1.05);
+			}
+			.data-item span {
+				display: block;
+				margin: 5px 0;
+			}
+			.data-item span.label {
+				font-weight: bold;
+			}
+			.data-item span.value {
+				color: #004d40;
+			}
+			.status-container {
+				display: flex;
+				justify-content: center; /* Center the items horizontally */
+				gap: 20px; /* Space between items */
+			}
+			.status-item {
+				flex: 1; /* Allow items to grow and shrink */
+				padding: 15px;
+				border: 2px solid #00796b;
+				border-radius: 10px;
+				background: #ffffff;
+				font-size: 1.1em;
+				text-align: center;
+			}
+			.status-item .status-label {
+				font-weight: bold;
+			}
+			.status-indicator {
+				margin-top: 10px;
+				padding: 10px;
+				border-radius: 50%;
+				width: 50px;
+				height: 50px;
+				display: inline-block;
+			}
+			.status-on {
+				background-color: #4caf50; /* Green for ON */
+			}
+			.status-off {
+				background-color: #f44336; /* Red for OFF */
+			}
+			@keyframes bounce {
+				0%,
+				20%,
+				50%,
+				80%,
+				100% {
+					transform: translateY(0);
+				}
+				40% {
+					transform: translateY(-20px);
+				}
+				60% {
+					transform: translateY(-10px);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Automated Water Flow and Quality Control</h1>
+			<div id="animation">Yo Gaki!</div>
+			<div id="sensor-data">
+				<div class="data-item">
+					<span class="label">Tank:</span>
+					<span class="value" id="bottom">Loading...</span>
+				</div>
+				<div class="data-item">
+					<span class="label">Temperature:</span>
+					<span class="value" id="temperature">Loading...</span>
+				</div>
+				<div class="data-item">
+					<span class="label">Turbidity:</span>
+					<span class="value" id="turbidity">Loading...</span>
+				</div>
+				<div class="data-item">
+					<span class="label">H₂S Level:</span>
+					<span class="value" id="h2s">Loading...</span>
+				</div>
+				<div class="status-container">
+					<div class="status-item">
+						<span class="status-label">Motor Status:</span>
+						<div
+							id="motor-status"
+							class="status-indicator status-off"
+						>
+							OFF
+						</div>
+					</div>
+					<div class="status-item">
+						<span class="status-label">RO Status:</span>
+						<div id="ro-status" class="status-indicator status-on">
+							ON
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			function fetchData() {
+				fetch('http://127.0.0.1:5000/data')
+					.then((response) => response.json())
+					.then((data) => {
+						console.log(data); // Debug print
+						document.getElementById('bottom').textContent =
+							data.bottom || 'Loading...';
+						document.getElementById('temperature').textContent =
+							'Loading...';
+						document.getElementById('turbidity').textContent =
+							data.turbidity || 'Loading...';
+						document.getElementById('h2s').textContent =
+							data.h2s || 'Loading...';
+
+						// Update motor status
+						const motorStatus =
+							data.motor.toUpperCase() === 'ON' ? 'ON' : 'OFF';
+						document.getElementById('motor-status').textContent =
+							motorStatus;
+						document.getElementById(
+							'motor-status'
+						).className = `status-indicator status-${motorStatus.toLowerCase()}`;
+
+						// Update RO status
+						const roStatus =
+							data.ro.toUpperCase() === 'ON' ? 'ON' : 'OFF';
+						document.getElementById('ro-status').textContent =
+							roStatus;
+						document.getElementById(
+							'ro-status'
+						).className = `status-indicator status-${roStatus.toLowerCase()}`;
+					})
+					.catch((error) => {
+						console.error('Error fetching data:', error);
+					});
+			}
+
+			// Fetch data every 5 seconds
+			setInterval(fetchData, 5000);
+
+			// Initial fetch
+			fetchData();
+		</script>
+	</body>
+</html>
