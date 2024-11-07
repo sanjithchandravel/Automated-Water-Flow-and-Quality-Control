@@ -13,6 +13,8 @@ This project focuses on monitoring and controlling water levels and quality in a
 
 ## Components
 
+(scenario.png)
+
 ### Hardware
 
 - **Arduino Board**: The microcontroller used to handle sensor data and control the system.
