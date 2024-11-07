@@ -13,7 +13,8 @@ This project focuses on monitoring and controlling water levels and quality in a
 
 ## Components
 
-(/scenario.png)
+![Scenario](scenario.png)
+
 
 ### Hardware
 
